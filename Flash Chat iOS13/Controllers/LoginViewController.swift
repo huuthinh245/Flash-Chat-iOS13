@@ -7,14 +7,46 @@
 //
 
 import UIKit
+import Firebase
 
-class LoginViewController: UIViewController {
-
+class LoginViewController: UIViewController  {
+    
     @IBOutlet weak var emailTextfield: UITextField!
     @IBOutlet weak var passwordTextfield: UITextField!
     
-
-    @IBAction func loginPressed(_ sender: UIButton) {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        emailTextfield.text = "aaa@gmail.com"
+        passwordTextfield.text = "123456"
     }
     
+    @IBAction func loginPressed(_ sender: UIButton) {
+        showAlert();
+        Auth.auth().signIn(withEmail: emailTextfield.text!, password: passwordTextfield.text!) { [weak self](success, error) in
+            if error != nil {
+                print(error)
+            }
+            if let data = success {
+                print(data.user.email as Any)
+                self?.dismiss(animated: true, completion: {
+                        self?.performSegue(withIdentifier: Constants.loginSegue, sender: self)
+                })
+            }
+        }
+    }
+    deinit {
+        print("destroy")
+    }
+    
+    func showAlert () {
+        let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
+
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.style = .medium
+        loadingIndicator.startAnimating();
+
+        alert.view.addSubview(loadingIndicator)
+        present(alert, animated: true, completion: nil)
+    }
 }
